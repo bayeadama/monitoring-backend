@@ -7,21 +7,24 @@ namespace Agent;
 public class AgentWorker : BackgroundService
 {
     private readonly ILogger<AgentWorker> _logger;
-    private IAgentFactory  _agentFactory;
+    private readonly IAgentFactory  _agentFactory;
+    private readonly IAgentConfigProvider _agentConfigProvider;
     private const string COMMANDER_EXCHANGE = "commander.pbp.exchange";
     private const string RESPONSE_EXCHANGE = "commander.response.exchange";
     private const string DEAD_LETTERS_EXCHANGE = "dead-letters.pbp.exchange";
     private const string ADDRESS = "ampq://guest:guest@localhost:5603/monitoring";
 
-    public AgentWorker(ILogger<AgentWorker> logger, IAgentFactory agentFactory)
+    public AgentWorker(ILogger<AgentWorker> logger, IAgentFactory agentFactory, IAgentConfigProvider agentConfigProvider)
     {
-        _logger = logger;
-        _agentFactory = agentFactory;
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _agentFactory = agentFactory ?? throw new ArgumentNullException(nameof(agentFactory));
+        _agentConfigProvider = agentConfigProvider ?? throw new ArgumentNullException(nameof(agentConfigProvider));;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var agentConfig = BuildAgentConfig(); 
+        //var agentConfig = BuildAgentConfig(); 
+        var agentConfig = _agentConfigProvider.GetConfig();
         var agent = await _agentFactory.Create(agentConfig);
         
         agent.OnCommandReceived += OnCommandReceived();
