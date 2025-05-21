@@ -8,6 +8,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Admin", "Admin\Admin.csproj", "{83D4A127-5534-4209-9A8C-FFFA25866F52}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Commander", "Commander\Commander.csproj", "{2FCE0AE4-3E4E-460E-898A-E1D52FA0237F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Listener", "Listener\Listener.csproj", "{B9991EFE-E047-4DD4-B3A5-A134F0E7A35F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +34,13 @@ Global
 		{83D4A127-5534-4209-9A8C-FFFA25866F52}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{83D4A127-5534-4209-9A8C-FFFA25866F52}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{83D4A127-5534-4209-9A8C-FFFA25866F52}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2FCE0AE4-3E4E-460E-898A-E1D52FA0237F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2FCE0AE4-3E4E-460E-898A-E1D52FA0237F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2FCE0AE4-3E4E-460E-898A-E1D52FA0237F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2FCE0AE4-3E4E-460E-898A-E1D52FA0237F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9991EFE-E047-4DD4-B3A5-A134F0E7A35F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9991EFE-E047-4DD4-B3A5-A134F0E7A35F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9991EFE-E047-4DD4-B3A5-A134F0E7A35F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9991EFE-E047-4DD4-B3A5-A134F0E7A35F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

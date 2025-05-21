@@ -4,7 +4,7 @@ public class QueueSetup
 {
     public string QueueName { get; set; }
     public string ExchangeName { get; set; }
-    public string RoutingKey { get; set; }
+    public List<string> RoutingKeys { get; set; }
 
     public Dictionary<string, object>? Arguments { get; set; }
 

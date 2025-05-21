@@ -45,9 +45,20 @@ public static class ChannelExtensions
         if (setup == null)
             throw new ArgumentNullException(nameof(setup));
         
-        var queueDeclareOk = await channel.QueueDeclareAsync(queue:setup.QueueName ?? string.Empty, arguments: setup.Arguments);
+        var queueDeclareOk = await channel.QueueDeclareAsync(
+            queue:setup.QueueName ?? string.Empty, 
+            arguments: setup.Arguments,
+            exclusive: false);
         var queueName = queueDeclareOk.QueueName;
-        await channel.QueueBindAsync(queueName, exchange:setup.ExchangeName, routingKey: setup.RoutingKey);
+
+        if (setup.RoutingKeys?.Count > 0)
+        {
+            foreach(var key in setup.RoutingKeys)
+                await channel.QueueBindAsync(queueName, exchange:setup.ExchangeName, routingKey: key);
+        }
+        else
+            await channel.QueueBindAsync(queueName, exchange:setup.ExchangeName, routingKey: "");
+
         
         return queueDeclareOk;
     }

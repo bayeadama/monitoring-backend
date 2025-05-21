@@ -5,6 +5,9 @@ namespace Common;
 public interface IAgent
 {
     string Id { get; set; }
+    public string ApplicationTrigram { get; set; }
+
+    public string ComponentName { get; set; }
 
     event OnCommandReceivedDelegate OnCommandReceived;
     
