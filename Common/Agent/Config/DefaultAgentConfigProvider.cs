@@ -2,19 +2,21 @@ using Microsoft.Extensions.Configuration;
 
 namespace Common;
 
-public class DefaultAgentConfigProvider : IAgentConfigProvider
+public class DefaultAgentConfigProvider : BaseConfigProvider, IAgentConfigProvider
 {
     private readonly IConfiguration  _configuration;
-    private const string ApplicationTrigramKey = "Monitoring.Agent:ApplicationTrigram";
-    private const string ComponentNameKey = "Monitoring.Agent:ComponentName";
-    private const string AgentIdKey = "Monitoring.Agent:AgentId";
-    private const string ServerUriKey = "Monitoring.Agent:ServerUri";
-    private const string CommanderExchangeKey = "Monitoring.Agent:CommanderExchange";
-    private const string ResponseExchangeKey = "Monitoring.Agent:ResponseExchange";
-    private const string DeadLetterExchangeKey = "Monitoring.Agent:DeadLetterExchange";
+    private const string DefaultConfigSection = "Monitoring.Agent";
+    private const string ApplicationTrigramKey = "ApplicationTrigram";
+    private const string ComponentNameKey = "ComponentName";
+    private const string AgentIdKey = "AgentId";
+    private const string ServerUriKey = "ServerUri";
+    private const string CommanderExchangeKey = "CommanderExchange";
+    private const string ResponseExchangeKey = "ResponseExchange";
+    private const string DeadLetterExchangeKey = "DeadLetterExchange";
     
     
-    public DefaultAgentConfigProvider(IConfiguration configuration)
+    public DefaultAgentConfigProvider(IConfiguration configuration, string configurationSection = DefaultConfigSection):
+        base(configurationSection)
     {
         _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
     }
@@ -22,13 +24,13 @@ public class DefaultAgentConfigProvider : IAgentConfigProvider
     {
         return new AgentConfig
         {
-            ApplicationTrigram = _configuration[ApplicationTrigramKey],
-            ComponentName = _configuration[ComponentNameKey],
-            ServerUri = new Uri(_configuration[ServerUriKey]),
-            AgentId = _configuration[AgentIdKey],
-            CommanderExchange = _configuration[CommanderExchangeKey],
-            DeadLettersExchange = _configuration[DeadLetterExchangeKey],
-            ResponseExchange = _configuration[ResponseExchangeKey]
+            ApplicationTrigram = _configuration[GetConfigKey(ApplicationTrigramKey)],
+            ComponentName = _configuration[GetConfigKey(ComponentNameKey)],
+            ServerUri = new Uri(_configuration[GetConfigKey(ServerUriKey)]),
+            AgentId = _configuration[GetConfigKey(AgentIdKey)],
+            CommanderExchange = _configuration[GetConfigKey(CommanderExchangeKey)],
+            DeadLettersExchange = _configuration[GetConfigKey(DeadLetterExchangeKey)],
+            ResponseExchange = _configuration[GetConfigKey(ResponseExchangeKey)]
         };
     }
 }

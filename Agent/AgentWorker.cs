@@ -9,11 +9,6 @@ public class AgentWorker : BackgroundService
     private readonly ILogger<AgentWorker> _logger;
     private readonly IAgentFactory  _agentFactory;
     private readonly IAgentConfigProvider _agentConfigProvider;
-    private const string COMMANDER_EXCHANGE = "commander.pbp.exchange";
-    private const string RESPONSE_EXCHANGE = "commander.response.exchange";
-    private const string DEAD_LETTERS_EXCHANGE = "dead-letters.pbp.exchange";
-    private const string ADDRESS = "ampq://guest:guest@localhost:5603/monitoring";
-
     public AgentWorker(ILogger<AgentWorker> logger, IAgentFactory agentFactory, IAgentConfigProvider agentConfigProvider)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -23,7 +18,6 @@ public class AgentWorker : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        //var agentConfig = BuildAgentConfig(); 
         var agentConfig = _agentConfigProvider.GetConfig();
         var agent = await _agentFactory.Create(agentConfig);
         
@@ -83,21 +77,5 @@ public class AgentWorker : BackgroundService
         };
         return analysisResult;
     }
-
-    private AgentConfig BuildAgentConfig()
-    {
-        var agentConfig = new AgentConfig
-        {
-            ApplicationTrigram = "pbp",
-            AgentId = "pbp.pgs.external",
-            ResponseExchange = RESPONSE_EXCHANGE,
-            DeadLettersExchange = DEAD_LETTERS_EXCHANGE,
-            CommanderExchange = COMMANDER_EXCHANGE,
-            ServerUri = new Uri(ADDRESS)
-        };
-        
-        return agentConfig;
-    }
-    
     
 }
