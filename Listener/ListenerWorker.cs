@@ -8,19 +8,19 @@ namespace Listener;
 public class ListenerWorker : BackgroundService
 {
     private readonly ILogger<ListenerWorker> _logger;
-    private IListenerFactory  _listenerFactory;
-    private const string RESPONSE_EXCHANGE = "commander.response.exchange";
-    private const string ADDRESS = "ampq://guest:guest@localhost:5603/monitoring";
+    private readonly IListenerFactory  _listenerFactory;
+    private readonly IListenerConfigProvider  _listenerConfigProvider;
     
-    public ListenerWorker(ILogger<ListenerWorker> logger, IListenerFactory listenerFactory)
+    public ListenerWorker(ILogger<ListenerWorker> logger, IListenerFactory listenerFactory, IListenerConfigProvider listenerConfigProvider)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _listenerFactory = listenerFactory  ?? throw new ArgumentNullException(nameof(listenerFactory));;
+        _listenerFactory = listenerFactory  ?? throw new ArgumentNullException(nameof(listenerFactory));
+        _listenerConfigProvider = listenerConfigProvider ?? throw new ArgumentNullException(nameof(listenerConfigProvider));
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        ListenerConfig config = BuildListenerConfig();
+        ListenerConfig config = _listenerConfigProvider.GetConfig();
         IListener listener = await _listenerFactory.Create(config);
         listener.OnResponseReceived += OnResponseReceived;
         
@@ -37,14 +37,4 @@ public class ListenerWorker : BackgroundService
 
     }
 
-    private ListenerConfig BuildListenerConfig()
-    {
-        var agentConfig = new ListenerConfig
-        {
-            ResponseExchange = RESPONSE_EXCHANGE,
-            ServerUri = new Uri(ADDRESS)
-        };
-        
-        return agentConfig;
-    }
 }

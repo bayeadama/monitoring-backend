@@ -7,19 +7,17 @@ namespace Commander;
 public class CommanderWorker : BackgroundService
 {
     private readonly ILogger<CommanderWorker> _logger;
-    private ICommanderFactory  _commanderFactory;
-    private const string COMMANDER_EXCHANGE = "commander.main.exchange";
-    private const string RESPONSE_EXCHANGE = "commander.response.exchange";
-    private const string DEAD_LETTERS_EXCHANGE = "dead-letters.pbp.exchange";
+    private readonly ICommanderFactory  _commanderFactory;
+    private readonly ICommanderConfigProvider  _commanderConfigProvider;
     private const string WHO_AM_I_COMMAND = "1";
     private const string MONITORING_COMMAND = "2";
-    private const string ADDRESS = "ampq://guest:guest@localhost:5603/monitoring";
 
 
-    public CommanderWorker(ILogger<CommanderWorker> logger, ICommanderFactory commanderFactory)
+    public CommanderWorker(ILogger<CommanderWorker> logger, ICommanderFactory commanderFactory, ICommanderConfigProvider commanderConfigProvider)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _commanderFactory = commanderFactory ?? throw new ArgumentNullException(nameof(commanderFactory));
+        _commanderConfigProvider = commanderConfigProvider ?? throw new ArgumentNullException(nameof(commanderConfigProvider));
         ;
     }
 
@@ -27,7 +25,7 @@ public class CommanderWorker : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation("Starting commander");
-        CommanderConfig config = BuildCommanderConfig();
+        CommanderConfig config = _commanderConfigProvider.GetConfig();
         ICommander commander = await _commanderFactory.Create(config);
         commander.OnResponseReceived += CommanderOnOnResponseReceived;
         
@@ -97,15 +95,4 @@ public class CommanderWorker : BackgroundService
         await commander.SendCommandAsync(whoAmICommand, "all");
     }
     
-    private CommanderConfig BuildCommanderConfig()
-    {
-        var agentConfig = new CommanderConfig
-        {
-            ResponseExchange = RESPONSE_EXCHANGE,
-            CommanderExchange = COMMANDER_EXCHANGE,
-            ServerUri = new Uri(ADDRESS)
-        };
-        
-        return agentConfig;
-    }
 }

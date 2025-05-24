@@ -9,6 +9,7 @@ builder.Services.AddSingleton<IChannelFactory, ChannelFactoryImpl>();
 builder.Services.AddSingleton<IAgentFactory, AgentFactoryImpl>();
 builder.Services.AddSingleton<IQueueSetupFactory, QueueSetupFactoryImpl>();
 builder.Services.AddSingleton<ICommanderFactory, CommanderFactoryImpl>();
+builder.Services.AddSingleton<ICommanderConfigProvider, DefaultCommanderConfigProvider>();
 builder.Services.AddHostedService<CommanderWorker>();
 
 var host = builder.Build();
