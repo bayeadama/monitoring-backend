@@ -40,6 +40,8 @@ public class DefaultWorkflow : IWorkflow
         
         //Before transition
         BeforeTransitionEvent?.Invoke(transitionContext);
+        if(!(triggerConfig.OnTransition?.Invoke(_currentState) ?? true))
+            return Result.Fail<string>(ErrorCodes.OnTransitionFailed);
         _currentState = triggerConfig.NextState;
         //After transition
         AfterTransitionEvent?.Invoke(transitionContext);

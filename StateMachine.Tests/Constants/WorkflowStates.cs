@@ -7,7 +7,7 @@ public static class WorkflowStates
     public const string WhoAmIRequestedState = "WhoAmI.Requested";
     public const string WhoAmICompletedState = "WhoAmI.Completed";
     
-    public const string AnalyseRequestedState = "WhoAmI.Requested";
-    public const string AnalyseCompletedState = "WhoAmI.Completed";
+    public const string AnalysisRequestedState = "Analysis.Requested";
+    public const string AnalysisCompletedState = "Analysis.Completed";
 
 }

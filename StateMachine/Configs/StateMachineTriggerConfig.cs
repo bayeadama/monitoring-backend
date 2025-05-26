@@ -8,4 +8,6 @@ public class StateMachineTriggerConfig
     
     public Func<string, bool> PreCondition { get; set; }
     
+    public Func<string, bool> OnTransition { get; set; }
+    
 }
