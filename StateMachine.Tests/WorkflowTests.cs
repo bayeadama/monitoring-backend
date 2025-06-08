@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using StateMachine.Configs;
+using StateMachine.Tests.Configs;
 using StateMachine.Tests.Constants;
 using StateMachine.Workflow;
 
@@ -12,7 +13,7 @@ public class WorkflowTests
 
     public void InitializeWorkflow(string? initialState = null)
     {
-        StateMachineConfig stateMachineConfig = BuildStateMachineConfig(initialState);
+        StateMachineConfig stateMachineConfig = StateMachineConfigBuilder.Build(initialState);
         IWorkflow workflow = new DefaultWorkflow(stateMachineConfig);
         _workflow = workflow;
     }
@@ -40,76 +41,5 @@ public class WorkflowTests
         result.Value.Should().Be(expectedState);
     }
 
-
-    private StateMachineConfig BuildStateMachineConfig(string? initialState = null)
-    {
-        StateMachineConfig stateMachineConfig = new StateMachineConfig
-        {
-            InitialStateName = initialState ?? WorkflowStates.InitiatedState,
-            StateTransitions = new Dictionary<string, List<StateMachineTriggerConfig>>
-            {
-                //Initial state
-                {
-                    WorkflowStates.InitiatedState, [
-                        new()
-                        {
-                            NextState = WorkflowStates.WhoAmIRequestedState,
-                            TriggerName = TriggerNames.RequestWhoAmiAction
-                        }
-                    ]
-                },
-                
-                //'Who Am I' requested
-                {
-                    WorkflowStates.WhoAmIRequestedState, [
-                        new()
-                        {
-                            NextState = WorkflowStates.WhoAmICompletedState,
-                            TriggerName = TriggerNames.WhoAmiCompletedAction
-                        }
-                    ]
-                },
-                
-                //'Who Am I' completed
-                {
-                    WorkflowStates.WhoAmICompletedState, [
-                        new()
-                        {
-                            NextState = WorkflowStates.WhoAmIRequestedState,
-                            TriggerName = TriggerNames.RequestWhoAmiAction
-                        },
-                        new()
-                        {
-                            NextState = WorkflowStates.AnalysisRequestedState,
-                            TriggerName = TriggerNames.RequestAnalysisAction
-                        }
-                    ]
-                },
-                
-                //'Analysis' requested
-                {
-                    WorkflowStates.AnalysisRequestedState, [
-                        new()
-                        {
-                            NextState = WorkflowStates.AnalysisCompletedState,
-                            TriggerName = TriggerNames.AnalysisCompletedAction
-                        }
-                    ]
-                },
-                
-                //'Analysis' completed
-                {
-                    WorkflowStates.AnalysisCompletedState, [
-                        new()
-                        {
-                            NextState = WorkflowStates.WhoAmIRequestedState,
-                            TriggerName = TriggerNames.RequestWhoAmiAction
-                        }
-                    ]
-                }
-            }
-        };
-
-        return stateMachineConfig;
-    }
+    
 }
