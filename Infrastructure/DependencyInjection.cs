@@ -19,18 +19,20 @@ public static class DependencyInjection
         {
             var cfg = serviceProvider.GetService<IConfiguration>();
             var serviceUri = cfg["RabbitMQ:Uri"];
-            if(serviceUri == null)
+            if (serviceUri == null)
                 return null;
-            
+
             var uri = new Uri(serviceUri);
             return uri.CreateChannelAsync().GetAwaiter().GetResult();
-            
         });
         services.AddSingleton<IQueueSetupFactory, QueueSetupFactory>();
         services.AddSingleton<IResponseMessagePublisherConfig, ResponseMessagePublisherConfig>();
         services.AddSingleton<ICommandMessageReceiverConfig, CommandMessageReceiverConfig>();
+        services.AddSingleton<IResponseMessageReceiverConfig, ResponseMessageReceiverConfig>();
+        services.AddSingleton<ICommandMessagePublisherConfig, CommandMessagePublisherConfig>();
         services.AddSingleton<IMessagePublisher<Agent, Response>, ResponseMessagePublisher>();
         services.AddSingleton<IMessageReceiver<Agent, Command>, CommandMessageReceiver>();
-
+        services.AddSingleton<IMessageReceiver<Listener, Response>, ResponseMessageReceiver>();
+        services.AddSingleton<IMessagePublisher<Commander, Command>, CommandMessagePublisher>();
     }
 }

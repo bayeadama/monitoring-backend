@@ -18,7 +18,7 @@ public class ResponseMessagePublisher : IMessagePublisher<Agent, Response>
         _channel = channel ?? throw new ArgumentNullException(nameof(channel));
     }
 
-    public async Task PublishAsync(Agent agent, Response message)
+    public async Task PublishAsync(Agent agent, Response message, string destination = null)
     {
         string responseExchange = _config.ResponseExchange;
         string? routingKey = agent.Name;

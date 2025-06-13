@@ -29,7 +29,7 @@ public class CommandMessageReceiver : IMessageReceiver<Agent, Command>
     public async Task RegisterHandlerAsync(Agent agent, Func<Command, Task> handler)
     {
         string queueName = $"agent.{agent.Name}";
-        await BindToCommanderExchangeAsync(_channel, queueName, agent);
+        await BindToCommanderExchangeAsync(queueName, agent);
         await _channel.AddConsumerAsync(queueName, (sender, args) => MessageReceived(sender, args, handler));
     }
 
@@ -44,7 +44,7 @@ public class CommandMessageReceiver : IMessageReceiver<Agent, Command>
         await handler(command);
     }
 
-    private async Task BindToCommanderExchangeAsync(IChannel channel, string queueName, Agent agent)
+    private async Task BindToCommanderExchangeAsync(string queueName, Agent agent)
     {
         var routingKeys = new List<string>
         {
@@ -59,6 +59,6 @@ public class CommandMessageReceiver : IMessageReceiver<Agent, Command>
             routingKeys);
         queueSetup.AddArgument(ArgumentNames.TimeToLive, TimeToLiveMilliseconds);
         queueSetup.AddArgument(ArgumentNames.DeadLetterExchange, _config.DeadLettersExchange);
-        await channel.SetupQueueAsync(queueSetup);
+        await _channel.SetupQueueAsync(queueSetup);
     }
 }

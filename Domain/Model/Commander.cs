@@ -2,7 +2,7 @@ using Domain.Base;
 
 namespace Domain.Model;
 
-public class Commander : BaseEntity
+public class Commander : Listener
 {
-    public string Name { get; set; }
+    
 }
