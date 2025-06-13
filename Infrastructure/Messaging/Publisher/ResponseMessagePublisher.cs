@@ -9,10 +9,10 @@ namespace Infrastructure.Messaging.Publisher;
 
 public class ResponseMessagePublisher : IMessagePublisher<Agent, Response>
 {
-    private readonly ResponseMessagePublisherConfig _config;
+    private readonly IResponseMessagePublisherConfig _config;
     private readonly IChannel _channel;
 
-    public ResponseMessagePublisher(ResponseMessagePublisherConfig config, IChannel channel)
+    public ResponseMessagePublisher(IResponseMessagePublisherConfig config, IChannel channel)
     {
         _config = config ?? throw new ArgumentNullException(nameof(config));
         _channel = channel ?? throw new ArgumentNullException(nameof(channel));

@@ -14,11 +14,11 @@ public class CommandMessageReceiver : IMessageReceiver<Agent, Command>
 {
     private const int TimeToLiveMilliseconds = 1000;
 
-    private readonly CommandMessageReceiverConfig _config;
+    private readonly ICommandMessageReceiverConfig _config;
     private readonly IChannel _channel;
     private readonly IQueueSetupFactory _queueSetupFactory;
 
-    public CommandMessageReceiver(CommandMessageReceiverConfig config, IChannel channel,
+    public CommandMessageReceiver(ICommandMessageReceiverConfig config, IChannel channel,
         IQueueSetupFactory queueSetupFactory)
     {
         _config = config ?? throw new ArgumentNullException(nameof(config));

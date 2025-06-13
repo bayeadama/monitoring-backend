@@ -25,9 +25,6 @@ public class DefaultWorkflow : IWorkflow
         if(!TryGetTriggerConfig(triggerName, out StateMachineTriggerConfig triggerConfig))
             return Result.Fail<string>(ErrorCodes.TriggerNotFound);
         
-        if(triggerConfig == null)
-            throw new ArgumentNullException(ErrorCodes.TriggerConfigValueNotFound);
-        
         //Check precondition
         if(!(triggerConfig.PreCondition?.Invoke(_currentState) ?? true))
             return Result.Fail<string>(ErrorCodes.TriggerPreconditionFailed);
@@ -55,12 +52,9 @@ public class DefaultWorkflow : IWorkflow
         if(!_machineConfig.StateTransitions.TryGetValue(_currentState, out List<StateMachineTriggerConfig> triggerConfigs))
             return false;
 
-        var foundConfig = triggerConfigs.FirstOrDefault(tc => tc.TriggerName == triggerName);
-        if(foundConfig == null)
-            return false;
+        triggerConfig = triggerConfigs.FirstOrDefault(tc => tc.TriggerName == triggerName);
         
-        triggerConfig = foundConfig;
-        return true;
+        return triggerConfig != null;
     }
 
     public event BeforeTransitionEventDelegate? BeforeTransitionEvent;

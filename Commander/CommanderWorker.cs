@@ -44,7 +44,9 @@ public class CommanderWorker : BackgroundService
 
     private void CommanderOnOnResponseReceived(Response response)
     {
-        string json = JsonSerializer.Serialize(response);
+        var payload = JsonSerializer.Deserialize<StandardMonitoringResult>(response.Payload);
+        
+        string json = JsonSerializer.Serialize(payload);
         _logger.LogInformation($"Received response (in commander): {json}");
         
         switch (response.FromCommand.Name)
