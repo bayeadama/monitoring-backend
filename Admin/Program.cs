@@ -1,25 +1,27 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
+using System;
+using System.Net.Http;
 using System.Net.Http.Headers;
-using Common;
-using RabbitMQ.Client;
+using System.Threading;
+using System.Threading.Tasks;
+using Admin;
+using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 
-Console.WriteLine("Hello, World!");
+var builder = Host.CreateApplicationBuilder(args);
+var services = builder.Services;
+services.AddHostedService<Worker>();
+//builder.Services.AddSignalR();
+var host = builder.Build();
+host.Run();
+
 
 while (true)
 {
-    Console.Write("> ");
-    string? readLine = Console.ReadLine();
     
-    if(readLine == "q")
-        break;
-
-    switch (readLine)
-    {
-        case "info":
-            await GetChannelInfo();
-            break;
-    }
+    Thread.Sleep(1000);
 }
 
 static async Task GetChannelInfo()

@@ -2,15 +2,14 @@ using System.Text;
 using System.Text.Json;
 using Application.Interfaces;
 using Domain.Model;
-using Domain.Model.ValueObjects;
 using Infrastructure.Constants;
 using Infrastructure.Extensions;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
-namespace Infrastructure.Messaging.Receiver;
+namespace Infrastructure.Messaging.Receiver.Command;
 
-public class CommandMessageReceiver : IMessageReceiver<Agent, Command>
+public class CommandMessageReceiver : IMessageReceiver<Agent, Domain.Model.ValueObjects.Command>
 {
     private const int TimeToLiveMilliseconds = 1000;
 
@@ -26,18 +25,18 @@ public class CommandMessageReceiver : IMessageReceiver<Agent, Command>
         _queueSetupFactory = queueSetupFactory ?? throw new ArgumentNullException(nameof(queueSetupFactory));
     }
 
-    public async Task RegisterHandlerAsync(Agent agent, Func<Command, Task> handler)
+    public async Task RegisterHandlerAsync(Agent agent, Func<Domain.Model.ValueObjects.Command, Task> handler)
     {
         string queueName = $"agent.{agent.Name}";
         await BindToCommanderExchangeAsync(queueName, agent);
         await _channel.AddConsumerAsync(queueName, (sender, args) => MessageReceived(sender, args, handler));
     }
 
-    private async Task MessageReceived(object sender, BasicDeliverEventArgs args, Func<Command, Task> handler)
+    private async Task MessageReceived(object sender, BasicDeliverEventArgs args, Func<Domain.Model.ValueObjects.Command, Task> handler)
     {
         byte[] body = args.Body.ToArray();
         var message = Encoding.UTF8.GetString(body);
-        var command = JsonSerializer.Deserialize<Command>(message);
+        var command = JsonSerializer.Deserialize<Domain.Model.ValueObjects.Command>(message);
 
         if (command == null) return;
 

@@ -31,6 +31,7 @@ public class DefaultWorkflow : IWorkflow
 
         var transitionContext = new WorkflowStateTransitionContext
         {
+            CurrentState = CurrentState,
             NewState = triggerConfig.NextState,
             TriggerName = triggerName
         };

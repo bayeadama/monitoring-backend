@@ -5,6 +5,8 @@ using Infrastructure.Extensions;
 using Infrastructure.Messaging;
 using Infrastructure.Messaging.Publisher;
 using Infrastructure.Messaging.Receiver;
+using Infrastructure.Messaging.Receiver.Command;
+using Infrastructure.Messaging.Receiver.Response;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RabbitMQ.Client;

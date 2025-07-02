@@ -1,4 +1,4 @@
-namespace Infrastructure.Messaging.Receiver;
+namespace Infrastructure.Messaging.Receiver.Response;
 
 public class ResponseMessageReceiverConfig: IResponseMessageReceiverConfig
 {

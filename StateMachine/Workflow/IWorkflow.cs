@@ -15,6 +15,7 @@ public interface IWorkflow
 
 public class WorkflowStateTransitionContext
 {
+    public string CurrentState { get; set; }
     public string TriggerName { get; set; }
     public string NewState { get; set; }
 }
