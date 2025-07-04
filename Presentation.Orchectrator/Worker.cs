@@ -6,6 +6,7 @@ using Domain.Model.ValueObjects;
 using Microsoft.AspNetCore.SignalR;
 using Presentation.Orchestrator.Constants;
 using StateMachine.Configs;
+using StateMachine.Workflow;
 
 namespace Presentation.Orchestrator;
 
@@ -41,59 +42,78 @@ public class Worker : BackgroundService
 
         _commander = await _commanderApplicationService.InitializeCommanderAsync("Commander");
         
-        _orchestrator.Workflow.AfterTransitionEvent += async (context) =>
-        {
-            _logger.LogInformation($"Transitioned from {context.CurrentState} to {context.NewState}" +
-                                   $" using trigger {context.TriggerName}");
-
-            await _monitoringHub.Clients.All.SendAsync("ReceiveStatusTransition", context.CurrentState, context.NewState);
-            
-            switch (context.NewState)
-            {
-                case WorkflowStates.WhoAmIRequestedState:
-                    await PublishWhoAmICommand();
-                    ProgrammedTask.ExecuteAsync(() =>
-                    {
-                        _orchestrator.Workflow.ApplyAction(TriggerNames.WhoAmiCompletedAction);
-                    }, 5000);
-                    break;
-                
-                case WorkflowStates.WhoAmICompletedState:
-                   
-                    ProgrammedTask.ExecuteAsync(async () =>
-                    {
-                        await PublishMonitoringCommand();
-                        _orchestrator.Workflow.ApplyAction(TriggerNames.RequestAnalysisAction);
-                    }, 5000);
-                    break;
-                
-                case WorkflowStates.AnalysisRequestedState:
-                    ProgrammedTask.ExecuteAsync(() =>
-                    {
-                        _orchestrator.Workflow.ApplyAction(TriggerNames.AnalysisCompletedAction);
-                    }, 5000);
-                    break;
-                
-                case WorkflowStates.AnalysisCompletedState:
-                    ProgrammedTask.ExecuteAsync(() =>
-                    {
-                        _orchestrator.Workflow.ApplyAction(TriggerNames.RequestWhoAmiAction);
-                    }, 5000);
-                    break;
-            }
-        };
+        _orchestrator.Workflow.AfterTransitionEvent += OnWorkflowOnAfterTransitionEvent;
         
     }
 
+    private async void OnWorkflowOnAfterTransitionEvent(WorkflowStateTransitionContext context)
+    {
+        _logger.LogInformation($"Transitioned from {context.CurrentState} to {context.NewState}" + $" using trigger {context.TriggerName}");
+        await _monitoringHub.Clients.All.SendAsync("ReceiveStatusTransition", context.CurrentState, context.NewState);
+        await SetupStatusTasks(context);
+    }
+
+    private async Task SetupStatusTasks(WorkflowStateTransitionContext context)
+    {
+        switch (context.NewState)
+        {
+            case WorkflowStates.WhoAmIRequestedState:
+                await HandleWhoAmIRequestEvent();
+                break;
+
+            case WorkflowStates.WhoAmICompletedState:
+                HandleWhoAmICompletedEvent();
+                break;
+
+            case WorkflowStates.AnalysisRequestedState:
+                HandleAnalysisRequestedEvent();
+                break;
+
+            case WorkflowStates.AnalysisCompletedState:
+                HandleAnalysisCompletedEvent();
+                break;
+        }
+    }
+
+    private void HandleAnalysisCompletedEvent()
+    {
+        ProgrammedTask.ExecuteAsync(() => { _orchestrator.Workflow.ApplyAction(TriggerNames.RequestWhoAmiAction); }, 5000);
+    }
+
+    private void HandleAnalysisRequestedEvent()
+    {
+        ProgrammedTask.ExecuteAsync(() => { _orchestrator.Workflow.ApplyAction(TriggerNames.AnalysisCompletedAction); }, 5000);
+    }
+
+    private void HandleWhoAmICompletedEvent()
+    {
+        ProgrammedTask.ExecuteAsync(async () =>
+        {
+            await PublishMonitoringCommand();
+            _orchestrator.Workflow.ApplyAction(TriggerNames.RequestAnalysisAction);
+        }, 5000);
+    }
+
+    private async Task HandleWhoAmIRequestEvent()
+    {
+        await PublishWhoAmICommand();
+        ProgrammedTask.ExecuteAsync(() => { _orchestrator.Workflow.ApplyAction(TriggerNames.WhoAmiCompletedAction); }, 5000);
+    }
+
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        await InitWorkflow();
+        await InfiniteLoop(stoppingToken);
+    }
+
+    private async Task InitWorkflow()
     {
         await ProgrammedTask.ExecuteAsync(() =>
         {
             _orchestrator.Workflow.ApplyAction(TriggerNames.RequestWhoAmiAction);
         }, 5000);
-        await WorkflowLoop(stoppingToken);
     }
-    
+
     private async Task PublishWhoAmICommand()
     {
         Command whoAmICommand = CommandFactory.CreateWhoAmiCommand();
@@ -106,7 +126,7 @@ public class Worker : BackgroundService
         await _commanderApplicationService.PublishCommandAsync(_commander, monitoringCommand, "all");
     }
     
-    private async Task WorkflowLoop(CancellationToken stoppingToken)
+    private async Task InfiniteLoop(CancellationToken stoppingToken)
     {
         var delay = 1000;
         while (!stoppingToken.IsCancellationRequested)
