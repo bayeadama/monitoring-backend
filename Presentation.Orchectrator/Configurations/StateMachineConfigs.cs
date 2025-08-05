@@ -1,44 +1,56 @@
+using Domain.Model;
 using Presentation.Orchestrator.Constants;
 using StateMachine.Configs;
 
-namespace Presentation.Orchestrator;
+namespace Presentation.Orchestrator.Configurations;
 
-public class StateMachineConfigBuilder
+public static class StateMachineConfigs
 {
-    public StateMachineConfig Build(string? initialState)
+    
+    public static StateMachineConfig GetStateMachineConfig(StateMachineType stateMachineType)
     {
-         StateMachineConfig stateMachineConfig = new StateMachineConfig
+        return stateMachineType switch
         {
-            InitialStateName = initialState ?? WorkflowStates.InitiatedState,
-            StateTransitions = new Dictionary<string, List<StateMachineTriggerConfig>>
-            {
-                //Initial state
-                {
-                    WorkflowStates.InitiatedState, BuildInitiatedStateTransitions()
-                },
-                
-                //'Who Am I' requested
-                {
-                    WorkflowStates.WhoAmIRequestedState, BuildWhoAmIRequestedStateTransitions()
-                },
-                
-                //'Who Am I' completed
-                {
-                    WorkflowStates.WhoAmICompletedState, BuildWhoAmICompletedStateTransitions()
-                },
-                
-                //'Analysis' requested
-                {
-                    WorkflowStates.AnalysisRequestedState, BuildAnalysisRequestedStateTransitions()
-                },
-                
-                //'Analysis' completed
-                {
-                    WorkflowStates.AnalysisCompletedState, BuildAnalysisCompletedStateTransitions()
-                }
-            }
+            StateMachineType.Standard => GetStandardWorkflowConfig(),
+            _ => throw new ArgumentOutOfRangeException(nameof(stateMachineType), stateMachineType, null)
         };
-         return stateMachineConfig;
+    }
+    
+    
+    private static StateMachineConfig GetStandardWorkflowConfig()
+    {
+            StateMachineConfig stateMachineConfig = new StateMachineConfig
+            {
+                InitialStateName = WorkflowStates.InitiatedState,
+                StateTransitions = new Dictionary<string, List<StateMachineTriggerConfig>>
+                {
+                    //Initial state
+                    {
+                        WorkflowStates.InitiatedState, BuildInitiatedStateTransitions()
+                    },
+                
+                    //'Who Am I' requested
+                    {
+                        WorkflowStates.WhoAmIRequestedState, BuildWhoAmIRequestedStateTransitions()
+                    },
+                
+                    //'Who Am I' completed
+                    {
+                        WorkflowStates.WhoAmICompletedState, BuildWhoAmICompletedStateTransitions()
+                    },
+                
+                    //'Analysis' requested
+                    {
+                        WorkflowStates.AnalysisRequestedState, BuildAnalysisRequestedStateTransitions()
+                    },
+                
+                    //'Analysis' completed
+                    {
+                        WorkflowStates.AnalysisCompletedState, BuildAnalysisCompletedStateTransitions()
+                    }
+                }
+            };
+            return stateMachineConfig;
     }
 
     private static List<StateMachineTriggerConfig> BuildInitiatedStateTransitions()

@@ -6,7 +6,7 @@ public class CommandMessageReceiverConfig : ICommandMessageReceiverConfig
     {
         get
         {
-            return "commander.pbp.exchange";
+            return "commander.main.exchange";
         }
     }
 

@@ -1,0 +1,190 @@
+{
+  "applications": [
+    {
+      "applicationId": "pbp",
+      "applicationShortName": "PG",
+      "applicationName": "Pb Portal",
+      "agents": [
+        "pbp.agent0",
+        "pbp.agent1",
+        "pbp.agent2",
+        "pbp.agent3",
+        "pbp.agent4",
+        "pbp.agent5",
+        "pbp.agent6",
+        "pbp.agent7",
+        "pbp.agent8",
+        "pbp.agent9",
+        "pbp.agent10",
+        "pbp.agent11",
+        "pbp.agent12",
+        "pbp.agent13",
+        "pbp.agent14",
+        "pbp.agent15",
+        "pbp.agent16",
+        "pbp.agent17",
+        "pbp.agent18",
+        "pbp.agent19",
+        "pbp.agent20",
+        "pbp.agent21",
+        "pbp.agent22",
+        "pbp.agent23",
+        "pbp.agent24",
+        "pbp.agent25",
+        "pbp.agent26",
+        "pbp.agent27",
+        "pbp.agent28",
+        "pbp.agent29",
+        "pbp.agent30",
+        "pbp.agent31",
+        "pbp.agent32",
+        "pbp.agent33",
+        "pbp.agent34",
+        "pbp.agent35",
+        "pbp.agent36",
+        "pbp.agent37",
+        "pbp.agent38",
+        "pbp.agent39"
+      ],
+      "ui": {
+        "groupsToPrioritize": [
+          "pbp.bbc",
+          "pbp.bbs",
+          "pbp.pgs"
+        ],
+        "translations": {
+          "pbp.bbc": "BBC",
+          "pbp.bbs": "BBS",
+          "pbp.pgs": "PGS",
+          "webapp": "Web Application",
+          "winservices": "Windows Services",
+          "app-pool-bbc-status": "App pool is UP ?",
+          "app-pool-bbc-lq-status": "App pool is UP (LQ) ?",
+          "app-pool-bbc-c-data-status": "App pool is UP (C-Data) ?",
+          "app-site-bbc-status": "App site is UP ?",
+          "app-site-bbc-lq-status": "App site is UP (LQ) ?",
+          "app-site-bbc-c-data-status": "App site is UP (C-Data) ?",
+          "ws-sx-message": "Windows Service SX Message",
+          "ws-fx-message": "Windows Service FX Message",
+          "ws-fx-timeout": "Windows Service FX Timeout",
+          "ws-sx-timeout": "Windows Service SX Timeout",
+          "app-pool-pgs-status": "PGS App pool is UP ?",
+          "app-pool-pgs-webapi-status": "PGS Web API App pool is UP ?",
+          "app-pool-pgs-light-status": "PGS Light App pool is UP ?",
+          "app-pool-pgs-webapi-light-status": "PGS Web API Light App pool is UP ?",
+          "app-site-pgs-status": "PGS App site is UP ?",
+          "app-site-pgs-light-status": "PGS Light App site is UP ?",
+          "app-pool-bbs-status": "BBS App pool is UP ?",
+          "app-site-bbs-status": "BBS App site is UP ?"
+        }
+      },
+      "workflow":{
+        "type": "standard",
+        "steps-waiting-times": {
+          "WhoAmI.Requested" : 5000,
+          "WhoAmI.Completed": 15000,
+          "Analysis.Requested" : 3000,
+          "Analysis.Completed": 10000
+        }
+      }
+    },
+    {
+      "applicationId": "pyr",
+      "applicationShortName": "PR",
+      "applicationName": "Pay Receive",
+      "agents": [
+        "pyr.agent0",
+        "pyr.agent1"
+      ],
+      "ui": {
+        "groupsToPrioritize": [
+          "webapp",
+          "winservices"
+        ],
+        "translations": {
+          "WebApp": "Web Application",
+          "winservices": "Windows Services"
+        }
+      },
+      "workflow":{
+        "type": "standard",
+        "steps-waiting-times": {
+          "WhoAmI.Requested" : 3000,
+          "WhoAmI.Completed": 10000,
+          "Analysis.Requested" : 10000,
+          "Analysis.Completed": 10000
+        }
+      }
+    }
+  ,
+    {
+      "applicationId": "dor",
+      "applicationShortName": "DOR",
+      "applicationName": "Dione Order",
+      "agents": [
+        "dor.agent0",
+        "dor.agent1",
+        "dor.agent2",
+        "dor.agent3",
+        "dor.agent4",
+        "dor.agent5",
+        "dor.agent6",
+        "dor.agent7"
+      ],
+      "ui": {
+        "groupsToPrioritize": [
+          "webapp",
+          "winservices"
+        ],
+        "translations": {
+          "webapp": "Web Application",
+          "winservices": "Windows Services"
+        }
+      },
+      "workflow":{
+        "type": "standard",
+        "steps-waiting-times": {
+          "WhoAmI.Requested" : 3000,
+          "WhoAmI.Completed": 10000,
+          "Analysis.Requested" : 10000,
+          "Analysis.Completed": 13000
+        }
+      }
+    }
+  ,
+    {
+      "applicationId": "din",
+      "applicationShortName": "DIN",
+      "applicationName": "Dione Instrument",
+      "agents": [
+        "din.agent0",
+        "din.agent1",
+        "din.agent2",
+        "din.agent3",
+        "din.agent4",
+        "din.agent5",
+        "din.agent6",
+        "din.agent7"
+      ],
+      "ui": {
+        "groupsToPrioritize": [
+          "webapp",
+          "winservices"
+        ],
+        "translations": {
+          "webapp": "Web Application",
+          "winservices": "Windows Services"
+        }
+      },
+      "workflow":{
+        "type": "standard",
+        "steps-waiting-times": {
+          "WhoAmI.Requested" : 3000,
+          "WhoAmI.Completed": 10000,
+          "Analysis.Requested" : 11000,
+          "Analysis.Completed": 12000
+        }
+      }
+    }
+  ]
+}

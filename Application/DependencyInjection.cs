@@ -11,12 +11,12 @@ public static class DependencyInjection
 {
     public static void AddApplicationServices(this IServiceCollection services)
     {
-        services.AddSingleton<IAgentApplicationService, AgentApplicationService>();
-        services.AddSingleton<IListenerApplicationService, ListenerApplicationService>();
-        services.AddSingleton<ICommanderApplicationService, CommanderApplicationService>();
-        services.AddSingleton<IOrchestratorApplicationService, OrchestratorApplicationService>();
+        services.AddTransient<IAgentApplicationService, AgentApplicationService>();
+        services.AddTransient<IListenerApplicationService, ListenerApplicationService>();
+        services.AddTransient<ICommanderApplicationService, CommanderApplicationService>();
+        services.AddTransient<IOrchestratorApplicationService, OrchestratorApplicationService>();
         services
-            .AddSingleton<IOrchestratorStateMachineConfiguratorApplicationService,
+            .AddTransient<IOrchestratorStateMachineConfiguratorApplicationService,
                 OrchestratorStateMachineConfiguratorApplicationService>();
     }
 }

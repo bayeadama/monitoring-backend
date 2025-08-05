@@ -27,14 +27,14 @@ public static class DependencyInjection
             var uri = new Uri(serviceUri);
             return uri.CreateChannelAsync().GetAwaiter().GetResult();
         });
-        services.AddSingleton<IQueueSetupFactory, QueueSetupFactory>();
-        services.AddSingleton<IResponseMessagePublisherConfig, ResponseMessagePublisherConfig>();
-        services.AddSingleton<ICommandMessageReceiverConfig, CommandMessageReceiverConfig>();
-        services.AddSingleton<IResponseMessageReceiverConfig, ResponseMessageReceiverConfig>();
-        services.AddSingleton<ICommandMessagePublisherConfig, CommandMessagePublisherConfig>();
-        services.AddSingleton<IMessagePublisher<Agent, Response>, ResponseMessagePublisher>();
-        services.AddSingleton<IMessageReceiver<Agent, Command>, CommandMessageReceiver>();
-        services.AddSingleton<IMessageReceiver<Listener, Response>, ResponseMessageReceiver>();
-        services.AddSingleton<IMessagePublisher<Commander, Command>, CommandMessagePublisher>();
+        services.AddTransient<IQueueSetupFactory, QueueSetupFactory>();
+        services.AddTransient<IResponseMessagePublisherConfig, ResponseMessagePublisherConfig>();
+        services.AddTransient<ICommandMessageReceiverConfig, CommandMessageReceiverConfig>();
+        services.AddTransient<IResponseMessageReceiverConfig, ResponseMessageReceiverConfig>();
+        services.AddTransient<ICommandMessagePublisherConfig, CommandMessagePublisherConfig>();
+        services.AddTransient<IMessagePublisher<Agent, Response>, ResponseMessagePublisher>();
+        services.AddTransient<IMessageReceiver<Agent, Command>, CommandMessageReceiver>();
+        services.AddTransient<IMessageReceiver<Listener, Response>, ResponseMessageReceiver>();
+        services.AddTransient<IMessagePublisher<Commander, Command>, CommandMessagePublisher>();
     }
 }
