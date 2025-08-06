@@ -186,5 +186,40 @@
         }
       }
     }
+  ,
+    {
+      "applicationId": "ant",
+      "applicationShortName": "ANT",
+      "applicationName": "Accounting",
+      "agents": [
+        "ant.agent0",
+        "ant.agent1",
+        "ant.agent2",
+        "ant.agent3",
+        "ant.agent4",
+        "ant.agent5",
+        "ant.agent6",
+        "ant.agent7"
+      ],
+      "ui": {
+        "groupsToPrioritize": [
+          "webapp",
+          "winservices"
+        ],
+        "translations": {
+          "webapp": "Web Application",
+          "winservices": "Windows Services"
+        }
+      },
+      "workflow":{
+        "type": "standard",
+        "steps-waiting-times": {
+          "WhoAmI.Requested" : 3000,
+          "WhoAmI.Completed": 10000,
+          "Analysis.Requested" : 11000,
+          "Analysis.Completed": 12000
+        }
+      }
+    }
   ]
 }

@@ -19,12 +19,6 @@ public class Worker : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        //var agent = await InitAgent();
-        
-        //_logger.LogInformation("Agent initialized: {AgentName}", agent.Name);
-        
-        //await RegisterCommandHandler(agent, CommandHandler);
-
         await GenerateAgents();
         
         await RunInfinitely(stoppingToken);
@@ -49,8 +43,7 @@ public class Worker : BackgroundService
         string group,
         string category,
         string host,
-        string checker,
-        MonitoringResult result)
+        string checker)
     {
         _logger.LogInformation("Processing command: {CommandName} for agent: {AgentName}", command.Name, agent.Name);
 
@@ -150,12 +143,11 @@ public class Worker : BackgroundService
         string group,
         string category,
         string host,
-        string checker,
-        MonitoringResult result)
+        string checker)
     {
         await RegisterCommandHandler(agent, (a, c) =>
         {
-            CommandHandler(a, c, group, category, host, checker, result);
+            CommandHandler(a, c, group, category, host, checker);
         });
     }
     
@@ -185,6 +177,8 @@ public class Worker : BackgroundService
 
         await GenerateDinAgents();
 
+        await GenerateAccountingAgents();
+
         await GeneratePgAppUsersCoutersAgents();
         
         GeneratePgAppResourceMonitoringAgents();
@@ -206,11 +200,11 @@ public class Worker : BackgroundService
 
 
         var pyrAgent1 = await InitAgent("pyr.agent0", prComponentWs, prTrigram);
-        await RegisterCommandHandler(pyrAgent1, "All modules", "WebApp", "localhost", "app-pool-status", result);
+        await RegisterCommandHandler(pyrAgent1, "All modules", "WebApp", "localhost", "app-pool-status");
         
         result = possibleResults[Random.Shared.Next(possibleResults.Length)];
         var pyrAgent2 = await InitAgent("pyr.agent1", prComponentWs, prTrigram);
-        await RegisterCommandHandler(pyrAgent2, "All modules","Win services", "localhost", "app-pool-status", result);
+        await RegisterCommandHandler(pyrAgent2, "All modules","Win services", "localhost", "app-pool-status");
     }
     
     private async Task GeneratePgAgents()
@@ -295,8 +289,7 @@ public class Worker : BackgroundService
                 config[0], 
                 config[1], 
                 config[2], 
-                config[3], 
-                result);
+                config[3]);
 
 
                         
@@ -343,8 +336,7 @@ public class Worker : BackgroundService
                 config[0], 
                 config[1], 
                 config[2], 
-                config[3], 
-                result);
+                config[3]);
 
 
                         
@@ -390,11 +382,46 @@ public class Worker : BackgroundService
                 config[0], 
                 config[1], 
                 config[2], 
-                config[3], 
-                result);
+                config[3]);
 
 
                         
+        }
+    }
+    
+    private async Task GenerateAccountingAgents()
+    {
+        const string trigram = "ant";
+        const string webAppComponent = "front";
+        const string winSvcComponent = "back";
+
+        var configs =new []
+        {
+            new []{ webAppComponent, "webapp", "antserver1", "app-pool-status"},
+            new []{ webAppComponent, "webapp", "dioserver1", "app-pool-root-status"},
+            
+            new []{ webAppComponent, "webapp", "dioserver1", "app-site-status"},
+            
+            new []{ webAppComponent, "webapp", "dioserver2", "app-pool-status"},
+            new []{ webAppComponent, "webapp", "dioserver2", "app-pool-root-status"},
+            
+            new []{ webAppComponent, "webapp", "dioserver2", "app-site-status"},
+            
+            
+            new []{ winSvcComponent, "winservices", "dioserver1", "listener-status"},
+            new []{ winSvcComponent, "winservices", "dioserver2", "listener-status"},
+        };
+
+        for (var i=0; i < configs.Length; i++)
+        {
+            var config = configs[i];
+            var agent = await InitAgent($"ant.agent{i}", config[0], trigram);
+  
+            await RegisterCommandHandler(agent, 
+                config[0], 
+                config[1], 
+                config[2], 
+                config[3]);
         }
     }
 
