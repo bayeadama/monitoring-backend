@@ -42,27 +42,7 @@ public class Worker : BackgroundService
     {
         await _agentApplicationService.RegisterCommandHandlerAsync(agent, commandHandler);
     }
-
-    private void CommandHandler(Domain.Model.Agent agent, Command command)
-    {
-        _logger.LogInformation("Processing command: {CommandName} for agent: {AgentName}", command.Name, agent.Name);
-
-        if (command.Name == CommandName.Monitoring)
-        {
-            var response = new StandardMonitoringResult
-            {
-                ApplicationTrigram = agent.ApplicationTrigram,
-                ComponentName = agent.ComponentName,
-                Category = "WebApp",
-                Host = "localhost",
-                Checker = "app-pool-status",
-                Result = MonitoringResult.Success
-            };
-            
-          _agentApplicationService.PublishResponseAsync(agent, command, response );
-        }
-        
-    }
+    
     
     private void CommandHandler(Domain.Model.Agent agent, 
         Command command,
@@ -76,6 +56,15 @@ public class Worker : BackgroundService
 
         if (command.Name == CommandName.Monitoring)
         {
+            var possibleResults = new[]
+            {
+                MonitoringResult.Success,
+                MonitoringResult.Warning,
+                MonitoringResult.Failure
+            };
+            
+            MonitoringResult mr = possibleResults[Random.Shared.Next(possibleResults.Length)];
+            
             var response = new StandardMonitoringResult
             {
                 ApplicationTrigram = agent.ApplicationTrigram,
@@ -83,7 +72,7 @@ public class Worker : BackgroundService
                 Category = category,
                 Host = host,
                 Checker = checker,
-                Result = result,
+                Result = mr,
                 AgentId = agent.Name,
                 Group = group
             };
@@ -92,6 +81,69 @@ public class Worker : BackgroundService
         }
         
     }
+
+    private async Task PublishCounterResponse(Domain.Model.Agent agent,
+        string group,
+        string category,
+        string host,
+        string checker,
+        int[] counterValues)
+    {
+         
+        int mr = counterValues[Random.Shared.Next(counterValues.Length)];
+        var response = new CounterMonitoringResult
+        {
+            ApplicationTrigram = agent.ApplicationTrigram,
+            ComponentName = agent.ComponentName,
+            Category = category,
+            Host = host,
+            Checker = checker,
+            Result = mr,
+            AgentId = agent.Name,
+            Group = group
+        };
+            
+        _agentApplicationService.PublishResponseAsync(agent, response );
+    }
+    
+    private async Task PublishResourseResponse(Domain.Model.Agent agent,
+        string group,
+        string category,
+        string host,
+        string checker,
+        int[] memValues,
+        int maxMemorySize,
+        int[] diskValues,
+        int maxDiskSize,
+        string title)
+    {
+         
+        int mv = memValues[Random.Shared.Next(memValues.Length)];
+        int dv = diskValues[Random.Shared.Next(diskValues.Length)];
+        
+        var response = new MonitoringResult<ResourceMonitoringResult>
+        {
+            ApplicationTrigram = agent.ApplicationTrigram,
+            ComponentName = agent.ComponentName,
+            Category = category,
+            Host = host,
+            Checker = checker,
+            Result = new ResourceMonitoringResult
+            {
+                TotalDiskSpace = maxDiskSize,
+                UsedDiskSpace = dv,
+                TotalMemory = maxMemorySize,
+                UsedMemory = mv,
+                MachineName = host,
+                Title = title
+            },
+            AgentId = agent.Name,
+            Group = group
+        };
+            
+        _agentApplicationService.PublishResponseAsync(agent, response );
+    }
+    
     
 
     private async Task RegisterCommandHandler(Domain.Model.Agent agent,
@@ -107,18 +159,7 @@ public class Worker : BackgroundService
         });
     }
     
-    private async Task<Domain.Model.Agent> InitAgent()
-    {
-        var agent = await _agentApplicationService.InitializeAgentAsync(new CreateAgentRequestDto
-        {
-            AgentId = "Agent1",
-            ApplicationTrigram = "APP",
-            ComponentName = "Component1",
-            AgentType = AgentType.SemiAutonomous
-        });
-        return agent;
-    }
-    
+
     private async Task<Domain.Model.Agent> InitAgent(string agentId, string componentName, string appTrigram)
     {
         var agent = await _agentApplicationService.InitializeAgentAsync(new CreateAgentRequestDto
@@ -143,6 +184,10 @@ public class Worker : BackgroundService
         await GenerateDorAgents();
 
         await GenerateDinAgents();
+
+        await GeneratePgAppUsersCoutersAgents();
+        
+        GeneratePgAppResourceMonitoringAgents();
     }
 
     private async Task GeneratePyrAgents()
@@ -352,6 +397,336 @@ public class Worker : BackgroundService
                         
         }
     }
+
+    private async Task GeneratePgAppResourceMonitoringAgents()
+    {
+        const string trigram = "pbp";
+        await GenerateGvaPgResourceMonitoringAgents(trigram);
+        await GenerateLdnPgResourceMonitoringAgents(trigram);
+        await GenerateLuxPgResourceMonitoringAgents(trigram);
+        await GenerateJrsPgResourceMonitoringAgents(trigram);
+        await GenerateMcmPgResourceMonitoringAgents(trigram);
+        await GenerateMilPgResourceMonitoringAgents(trigram);
+    }
+
+    private async Task GenerateMilPgResourceMonitoringAgents(string trigram)
+    {
+        var agent1 = await InitAgent("resources.pbp.mil.agent1","pbp.mil.resources",trigram );
+        
+        RunInfiniteLoop(() =>
+        {
+            PublishResourseResponse(agent1,
+                "MIL resources",
+                "resources.monitoring",
+                "pgs.mil.host1",
+                "pgs.mil.resources.monitoring", 
+                new[] { 70, 75, 80, 96 }, 100,
+                new[] { 70, 75, 80, 96 }, 100,
+                "FRONT");
+        }, 5000, CancellationToken.None);
+        
+        var agent2 = await InitAgent("resources.pbp.mil.agent2","pbp.mil.resources",trigram );
+        
+        RunInfiniteLoop(() =>
+        {
+            PublishResourseResponse(agent2,
+                "MIL resources",
+                "resources.monitoring",
+                "pgs.mil.host2",
+                "bbs.mil.resources.monitoring", 
+                new[] { 70, 75, 80, 96 }, 100,
+                new[] { 70, 75, 80, 96 }, 100,
+                "BBS");
+        }, 5000, CancellationToken.None);
+    }
+    private async Task GenerateMcmPgResourceMonitoringAgents(string trigram)
+    {
+        var agent1 = await InitAgent("resources.pbp.mcm.agent1","pbp.mcm.resources",trigram );
+        
+        RunInfiniteLoop(() =>
+        {
+            PublishResourseResponse(agent1,
+                "MCM resources",
+                "resources.monitoring",
+                "pgs.mcm.host1",
+                "pgs.mcm.resources.monitoring", 
+                new[] { 70, 75, 80, 96 }, 100,
+                new[] { 70, 75, 80, 96 }, 100,
+                "FRONT");
+        }, 5000, CancellationToken.None);
+        
+        var agent2 = await InitAgent("resources.pbp.mcm.agent2","pbp.mcm.resources",trigram );
+        
+        RunInfiniteLoop(() =>
+        {
+            PublishResourseResponse(agent2,
+                "MCM resources",
+                "resources.monitoring",
+                "pgs.mcm.host2",
+                "bbs.mcm.resources.monitoring", 
+                new[] { 70, 75, 80, 96 }, 100,
+                new[] { 70, 75, 80, 96 }, 100,
+                "BBS");
+        }, 5000, CancellationToken.None);
+    }
+    
+    private async Task GenerateJrsPgResourceMonitoringAgents(string trigram)
+    {
+        var agent1 = await InitAgent("resources.pbp.jrs.agent1","pbp.jrs.resources",trigram );
+        
+        RunInfiniteLoop(() =>
+        {
+            PublishResourseResponse(agent1,
+                "JRS resources",
+                "resources.monitoring",
+                "pgs.jrs.host1",
+                "pgs.jrs.resources.monitoring", 
+                new[] { 70, 75, 80, 96 }, 100,
+                new[] { 70, 75, 80, 96 }, 100,
+                "FRONT");
+        }, 5000, CancellationToken.None);
+        
+        var agent2 = await InitAgent("resources.pbp.jrs.agent2","pbp.jrs.resources",trigram );
+        
+        RunInfiniteLoop(() =>
+        {
+            PublishResourseResponse(agent2,
+                "JRS resources",
+                "resources.monitoring",
+                "pgs.jrs.host2",
+                "bbs.jrs.resources.monitoring", 
+                new[] { 70, 75, 80, 96 }, 100,
+                new[] { 70, 75, 80, 96 }, 100,
+                "BBS");
+        }, 5000, CancellationToken.None);
+    }
+    
+    private async Task GenerateLuxPgResourceMonitoringAgents(string trigram)
+    {
+        var agent1 = await InitAgent("resources.pbp.lux.agent1","pbp.lux.resources",trigram );
+        
+        RunInfiniteLoop(() =>
+        {
+            PublishResourseResponse(agent1,
+                "LUX resources",
+                "resources.monitoring",
+                "pgs.lux.host1",
+                "pgs.lux.resources.monitoring", 
+                new[] { 70, 75, 80, 96 }, 100,
+                new[] { 70, 75, 80, 96 }, 100,
+                "FRONT");
+        }, 5000, CancellationToken.None);
+        
+        var agent2 = await InitAgent("resources.pbp.lux.agent2","pbp.lux.resources",trigram );
+        
+        RunInfiniteLoop(() =>
+        {
+            PublishResourseResponse(agent2,
+                "LUX resources",
+                "resources.monitoring",
+                "pgs.lux.host2",
+                "bbs.lux.resources.monitoring", 
+                new[] { 70, 75, 80, 96 }, 100,
+                new[] { 70, 75, 80, 96 }, 100,
+                "BBS");
+        }, 5000, CancellationToken.None);
+    }
+    
+    private async Task GenerateLdnPgResourceMonitoringAgents(string trigram)
+    {
+        var agent1 = await InitAgent("resources.pbp.ldn.agent1","pbp.ldn.resources",trigram );
+        
+        RunInfiniteLoop(() =>
+        {
+            PublishResourseResponse(agent1,
+                "LDN resources",
+                "resources.monitoring",
+                "pgs.ldn.host1",
+                "pgs.ldn.resources.monitoring", 
+                new[] { 70, 75, 80, 96 }, 100,
+                new[] { 70, 75, 80, 96 }, 100,
+                "FRONT");
+        }, 5000, CancellationToken.None);
+        
+        var agent2 = await InitAgent("resources.pbp.ldn.agent2","pbp.ldn.resources",trigram );
+        
+        RunInfiniteLoop(() =>
+        {
+            PublishResourseResponse(agent2,
+                "LDN resources",
+                "resources.monitoring",
+                "pgs.ldn.host2",
+                "bbs.ldn.resources.monitoring", 
+                new[] { 70, 75, 80, 96 }, 100,
+                new[] { 70, 75, 80, 96 }, 100,
+                "BBS");
+        }, 5000, CancellationToken.None);
+    }
+    
+    private async Task GenerateGvaPgResourceMonitoringAgents(string trigram)
+    {
+        var gvaAgentPgs1 = await InitAgent("resources.pbp.gva.agent1","pbp.gva.resources",trigram );
+        
+        RunInfiniteLoop(() =>
+        {
+            PublishResourseResponse(gvaAgentPgs1,
+                "GVA resources",
+                "resources.monitoring",
+                "pgs.gva.host1",
+                "pgs-1.gva.resources.monitoring", 
+                new[] { 70, 75, 80, 96 }, 100,
+                new[] { 70, 75, 80, 96 }, 100,
+                "FRONT1");
+        }, 5000, CancellationToken.None);
+        
+        var gvaAgentPgs2 = await InitAgent("resources.pbp.gva.agent2","pbp.gva.resources",trigram );
+        
+        RunInfiniteLoop(() =>
+        {
+            PublishResourseResponse(gvaAgentPgs2,
+                "GVA resources",
+                "resources.monitoring",
+                "pgs.gva.host2",
+                "pgs-2.gva.resources.monitoring", 
+                new[] { 70, 75, 80, 96 }, 100,
+                new[] { 70, 75, 80, 96 }, 100,
+                "FRONT2");
+        }, 5000, CancellationToken.None);
+        
+        var gvaAgentBbs1 = await InitAgent("resources.pbp.gva.agent3","pbp.gva.resources",trigram );
+        
+        RunInfiniteLoop(() =>
+        {
+            PublishResourseResponse(gvaAgentBbs1,
+                "GVA resources",
+                "resources.monitoring",
+                "bbs.gva.host1",
+                "bbs-1.gva.resources.monitoring", 
+                new[] { 70, 75, 80, 96 }, 100,
+                new[] { 70, 75, 80, 96 }, 100,
+                "BBS1");
+        }, 5000, CancellationToken.None);
+        
+        var gvaAgentBbs2 = await InitAgent("resources.pbp.gva.agent4","pbp.gva.resources",trigram );
+        
+        RunInfiniteLoop(() =>
+        {
+            PublishResourseResponse(gvaAgentBbs2,
+                "GVA resources",
+                "resources.monitoring",
+                "bbs.gva.host2",
+                "bbs-2.gva.resources.monitoring", 
+                new[] { 70, 75, 80, 96 }, 100,
+                new[] { 70, 75, 80, 96 }, 100,
+                "BBS2");
+        }, 5000, CancellationToken.None);
+    }
+
+
+    private async Task GeneratePgAppUsersCoutersAgents()
+    {
+        const string trigram = "pbp";
+        var gvaAgent = await InitAgent("counter.pbp.gva.agent","pbp.gva.users",trigram );
+        
+        RunInfiniteLoop(() =>
+        {
+            PublishCounterResponse(gvaAgent,
+                "GVA users",
+                "stats.counter",
+                "localhost",
+                "pgs-1.gva.users.stats.counter",
+                new[] { 450,460, 444, 500 });
+        }, 5000, CancellationToken.None);
+        
+        var jrsAgent = await InitAgent("counter.pbp.jrs.agent","pbp.jrs.users",trigram );
+        
+        RunInfiniteLoop(() =>
+        {
+            PublishCounterResponse(jrsAgent,
+                "JRS users",
+                "stats.counter",
+                "localhost",
+                "pgs.jrs.users.stats.counter",
+                new[] { 100,110, 120, 150 });
+        }, 5000, CancellationToken.None);
+        
+        var ldnAgent = await InitAgent("counter.pbp.ldn.agent","pbp.ldn.users",trigram );
+        
+        RunInfiniteLoop(() =>
+        {
+            PublishCounterResponse(ldnAgent,
+                "LDN users",
+                "stats.counter",
+                "localhost",
+                "pgs.ldn.users.stats.counter",
+                new[] { 100,110, 120, 150 });
+        }, 5000, CancellationToken.None);
+        
+
+        
+        var mcmAgent = await InitAgent("counter.pbp.mcm.agent","pbp.mcm.users",trigram );
+        
+        RunInfiniteLoop(() =>
+        {
+            PublishCounterResponse(mcmAgent,
+                "MCM users",
+                "stats.counter",
+                "localhost",
+                "pgs.mcm.users.stats.counter",
+                new[] { 100,110, 120, 150 });
+        }, 5000, CancellationToken.None);
+        
+        var milAgent = await InitAgent("counter.pbp.mil.agent","pbp.mil.users",trigram );
+        
+        RunInfiniteLoop(() =>
+        {
+            PublishCounterResponse(milAgent,
+                "MIL users",
+                "stats.counter",
+                "localhost",
+                "pgs.mil.users.stats.counter",
+                new[] { 100,110, 120, 150 });
+        }, 5000, CancellationToken.None);
+        
+        var luxAgent = await InitAgent("counter.pbp.lux.agent","pbp.lux.users",trigram );
+        
+        RunInfiniteLoop(() =>
+        {
+            PublishCounterResponse(luxAgent,
+                "LUX users",
+                "stats.counter",
+                "localhost",
+                "pgs.lux.users.stats.counter",
+                new[] { 100,110, 120, 150 });
+        }, 5000, CancellationToken.None);
+        
+        
+    }
     
     
+    private Task RunInfiniteLoop(Action action, int waitingTime, CancellationToken stoppingToken)
+    {
+        return Task.Run(async () =>
+        {
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                action();
+                await Task.Delay(waitingTime, stoppingToken);
+            }
+        }, stoppingToken);
+    }
+    
+}
+
+public class ResourceMonitoringResult
+{
+    public int UsedMemory { get; set; }
+    public int TotalMemory { get; set; }
+    
+    public int UsedDiskSpace { get; set; }
+    public int TotalDiskSpace { get; set; }
+
+    public string MachineName { get; set; }
+
+    public string Title { get; set; }
 }

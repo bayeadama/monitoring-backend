@@ -70,6 +70,24 @@ public class AgentApplicationService : IAgentApplicationService
 
         return _responseMessagePublisher.PublishAsync(agent, response);
     }
+    
+    public Task PublishResponseAsync<T>(Domain.Model.Agent agent, T agentResponse)
+    {
+        if (agent == null)
+            throw new ArgumentNullException(nameof(agent));
+        
+        if (agentResponse == null)
+            throw new ArgumentNullException(nameof(agentResponse));
+
+        var response = new Response
+        {
+            ApplicationTrigram = agent.ApplicationTrigram,
+            FromAgent = agent.Name,
+            Payload = JsonSerializer.Serialize(agentResponse)
+        };
+
+        return _responseMessagePublisher.PublishAsync(agent, response);
+    }
 
     private Domain.Model.Agent InitAgent(CreateAgentRequestDto createAgentRequest)
     {

@@ -29,4 +29,13 @@ public interface IAgentApplicationService
    /// <typeparam name="T"></typeparam>
    /// <returns></returns>
     Task PublishResponseAsync<T>(Domain.Model.Agent agent, Command sourceCommand, T agentResponse);
+   
+   /// <summary>
+   /// Publishes a response from the agent.
+   /// </summary>
+   /// <param name="agent"></param>
+   /// <param name="agentResponse"></param>
+   /// <typeparam name="T"></typeparam>
+   /// <returns></returns>
+    Task PublishResponseAsync<T>(Domain.Model.Agent agent, T agentResponse);
 }

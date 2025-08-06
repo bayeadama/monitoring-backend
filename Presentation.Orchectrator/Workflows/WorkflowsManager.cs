@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Application.Services.Commander;
 using Application.Services.Orchestrator;
 using Domain;
@@ -197,36 +198,46 @@ public  class WorkflowsManager : IWorkflowsManager
     
     private async Task ResponseHandler(Listener listener, Response response) 
     {
-        var random = new Random();
-        switch (response.FromCommand.Name)
+        if (response.FromCommand != null)
         {
-            case CommandName.WhoAmI:
-                await Task.Run(async () =>
-                {
-                    //await _monitoringHub.Clients.All.SendAsync(MonitoringHub.WhoAmIResultEvent, $"[Pre] {response.Payload}");
-                    _logger.LogInformation($"WhoAmI response received: {response.Payload}");
-                    await Task.Delay(random.Next(1, 8) * 1000); // Simulate delay
-                    await _monitoringHub.Clients.All.SendAsync(MonitoringHub.WhoAmIResultEvent, response.Payload);
+            var random = new Random();
+            switch (response.FromCommand.Name)
+            {
+                case CommandName.WhoAmI:
+                    await Task.Run(async () =>
+                    {
+                        //await _monitoringHub.Clients.All.SendAsync(MonitoringHub.WhoAmIResultEvent, $"[Pre] {response.Payload}");
+                        _logger.LogInformation($"WhoAmI response received: {response.Payload}");
+                        await Task.Delay(random.Next(1, 8) * 1000); // Simulate delay
+                        await _monitoringHub.Clients.All.SendAsync(MonitoringHub.WhoAmIResultEvent, response.Payload);
 
-                });
-                break;
+                    });
+                    break;
 
-            case CommandName.Monitoring:
-                await Task.Run(async () =>
-                {
-                    _logger.LogInformation($"Monitoring response received: {response.Payload}");
-                    await Task.Delay(random.Next(1, 8) * 1000); // Simulate delay
-                    await _monitoringHub.Clients.All.SendAsync(MonitoringHub.ReceiveAnalysisResultEvent, response.Payload);
-                });
-                break;
+                case CommandName.Monitoring:
+                    await Task.Run(async () =>
+                    {
+                        _logger.LogInformation($"Monitoring response received: {response.Payload}");
+                        await Task.Delay(random.Next(1, 8) * 1000); // Simulate delay
+                        await _monitoringHub.Clients.All.SendAsync(MonitoringHub.ReceiveAnalysisResultEvent,
+                            response.Payload);
+                    });
+                    break;
 
-            default:
-                _logger.LogWarning($"Unknown command response received: {response.FromCommand.Name}");
-                break;
+                default:
+                    _logger.LogWarning($"Unknown command response received: {response.FromCommand.Name}");
+                    break;
+            }
         }
-       
+        else
+        {
+            await _monitoringHub.Clients.All.SendAsync(MonitoringHub.AutonomousAgentAnalysisEvent, 
+                response.ApplicationTrigram
+                ,response.FromAgent, 
+                response.Payload);
+        }
     }
-    
+
     private static string GetOrchestratorName(string applicationId) => $"Orchestrator_{applicationId}";
     
 }
