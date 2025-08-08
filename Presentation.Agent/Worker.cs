@@ -179,6 +179,8 @@ public class Worker : BackgroundService
 
         await GenerateAccountingAgents();
 
+        await GenerateSupplierAgents();
+
         await GeneratePgAppUsersCoutersAgents();
         
         GeneratePgAppResourceMonitoringAgents();
@@ -425,6 +427,42 @@ public class Worker : BackgroundService
         }
     }
 
+    private async Task GenerateSupplierAgents()
+    {
+        const string trigram = "sup";
+        const string webAppComponent = "front";
+        const string winSvcComponent = "back";
+
+        var configs =new []
+        {
+            new []{ webAppComponent, "webapp", "antserver1", "app-pool-status"},
+            new []{ webAppComponent, "webapp", "dioserver1", "app-pool-root-status"},
+            
+            new []{ webAppComponent, "webapp", "dioserver1", "app-site-status"},
+            
+            new []{ webAppComponent, "webapp", "dioserver2", "app-pool-status"},
+            new []{ webAppComponent, "webapp", "dioserver2", "app-pool-root-status"},
+            
+            new []{ webAppComponent, "webapp", "dioserver2", "app-site-status"},
+            
+            
+            new []{ winSvcComponent, "winservices", "dioserver1", "listener-status"},
+            new []{ winSvcComponent, "winservices", "dioserver2", "listener-status"},
+        };
+
+        for (var i=0; i < configs.Length; i++)
+        {
+            var config = configs[i];
+            var agent = await InitAgent($"sup.agent{i}", config[0], trigram);
+  
+            await RegisterCommandHandler(agent, 
+                config[0], 
+                config[1], 
+                config[2], 
+                config[3]);
+        }
+    }
+    
     private async Task GeneratePgAppResourceMonitoringAgents()
     {
         const string trigram = "pbp";

@@ -221,5 +221,40 @@
         }
       }
     }
+  ,
+    {
+      "applicationId": "sup",
+      "applicationShortName": "SUP",
+      "applicationName": "Supplier",
+      "agents": [
+        "sup.agent0",
+        "sup.agent1",
+        "sup.agent2",
+        "sup.agent3",
+        "sup.agen4",
+        "sup.agent5",
+        "sup.agent6",
+        "sup.agent7"
+      ],
+      "ui": {
+        "groupsToPrioritize": [
+          "webapp",
+          "winservices"
+        ],
+        "translations": {
+          "webapp": "Web Application",
+          "winservices": "Windows Services"
+        }
+      },
+      "workflow":{
+        "type": "standard",
+        "steps-waiting-times": {
+          "WhoAmI.Requested" : 3000,
+          "WhoAmI.Completed": 10000,
+          "Analysis.Requested" : 11000,
+          "Analysis.Completed": 12000
+        }
+      }
+    }
   ]
 }
