@@ -36,13 +36,13 @@ public  class WorkflowsManager : IWorkflowsManager
         _logger = logger;
         _applicationsConfigurations = applicationsConfigurations;
 
-        _commander = InitCommander().GetAwaiter().GetResult();
+        _commander = InitCommanderAsync().GetAwaiter().GetResult();
     }
 
     public async Task InitWorkflow(string applicationId)
     {
         StateMachineConfig stateMachineConfig = InitializeStateMachine(applicationId);
-        Domain.Model.Orchestrator orchestrator = await InitOrchestrator(applicationId, stateMachineConfig);
+        Domain.Model.Orchestrator orchestrator = await InitOrchestratorAsync(applicationId, stateMachineConfig);
         
         await ProgrammedTask.ExecuteAsync(() =>
         {
@@ -98,7 +98,7 @@ public  class WorkflowsManager : IWorkflowsManager
 
     
     
-    private async Task<Commander> InitCommander()
+    private async Task<Commander> InitCommanderAsync()
     {
         var commander = await _commanderApplicationService.InitializeCommanderAsync(MainCommanderName);
         await _commanderApplicationService.RegisterResponseHandlerAsync(commander, 
@@ -106,7 +106,7 @@ public  class WorkflowsManager : IWorkflowsManager
         return commander;
     }
 
-    private async Task<Domain.Model.Orchestrator> InitOrchestrator(string applicationId, 
+    private async Task<Domain.Model.Orchestrator> InitOrchestratorAsync(string applicationId, 
         StateMachineConfig stateMachineConfig)
     {
         var orchestrator = await _orchestratorApplicationService.InitializeOrchestratorAsync(GetOrchestratorName(applicationId));

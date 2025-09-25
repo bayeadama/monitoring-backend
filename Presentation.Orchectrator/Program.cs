@@ -13,13 +13,26 @@ builder.Services.AddSignalR();
 
 builder.Services.AddCors(options =>
 {
+    var serviceProvider = services.BuildServiceProvider();
+    var cfg = serviceProvider.GetService<IConfiguration>();
+    var corsOrigins = cfg["Cors:Origins"];
+    
     options.AddPolicy(name: "corsPolicy1",
         policy  =>
         {
-            policy.WithOrigins("http://localhost:5173")
-                  .AllowAnyHeader()
-                  .AllowAnyMethod()
-                  .AllowCredentials();
+            //policy.WithOrigins("http://localhost:5173")
+            if (corsOrigins != null)
+            {
+                foreach (var origin in corsOrigins.Split(','))
+                {
+                    policy = policy.WithOrigins(origin);
+                }
+
+                policy.AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials();
+            }
+      
         });
 });
 
